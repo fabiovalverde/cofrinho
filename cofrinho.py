@@ -2,6 +2,13 @@ import streamlit as st
 import plotly.graph_objects as go
 import json
 import datetime
+import locale
+
+# Define o locale com base no sistema operacional
+try:
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')  # Linux/mac
+except:
+    locale.setlocale(locale.LC_ALL, 'Portuguese_Brazil.1252')  # Windows
 
 st.set_page_config(page_title="Simulador Cofrinho Itaú", layout="centered")
 st.title("💰 Simulador Cofrinho Itaú - Aporte Mensal")
@@ -14,13 +21,15 @@ Simule a evolução do seu investimento como no Cofrinho do Itaú.
 - **Aportes aplicados a cada 30 dias**
 """)
 
-# Entrada de dados
-valor_inicial = st.number_input("Valor inicial (R$)", min_value=0.0, value=100.0, step=10.0)
-aporte_mensal = st.number_input("Aporte mensal (R$)", min_value=0.0, value=200.0, step=10.0)
+# Entradas com valores padrão ajustados
+valor_inicial = st.number_input("Valor inicial (R$)", min_value=0.0, value=10000.0, step=100.0, format="%.2f")
+aporte_mensal = st.number_input("Aporte mensal (R$)", min_value=0.0, value=0.0, step=50.0, format="%.2f")
 dias = st.slider("Número de dias para simulação", min_value=30, max_value=365, value=180)
 
-# Simulação
+# Rendimento diário baseado em 100% do CDI (10,65% a.a.)
 rendimento_dia = 0.1065 / 365
+
+# Simulação
 saldos = []
 datas = []
 saldo = valor_inicial
@@ -44,12 +53,13 @@ fig.update_layout(
     title="📈 Evolução do Saldo",
     xaxis_title="Data",
     yaxis_title="Saldo (R$)",
-    template="plotly_white"
+    template="plotly_white",
+    yaxis_tickformat=".2f"
 )
 st.plotly_chart(fig, use_container_width=True)
 
-# Exibir saldo final
-st.success(f"Saldo final após {dias} dias: **R$ {saldos[-1]:,.2f}**")
+# Exibir saldo final formatado
+st.success(f"Saldo final após {dias} dias: **{locale.currency(saldos[-1], grouping=True)}**")
 
 # Exportar dados como JSON
 data_export = {
