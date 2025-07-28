@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 import json
 import datetime
 
-# Função para formatar valores como "R$ 16.000,00"
+# Função para formatar valores em reais
 def formatar_brl(valor):
     return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
@@ -18,15 +18,13 @@ Simule a evolução do seu investimento como no Cofrinho do Itaú.
 - **Aportes aplicados a cada 30 dias**
 """)
 
-# Entradas com valores padrão ajustados
-valor_inicial = st.number_input("Valor inicial (R$)", min_value=0.0, value=10000.0, step=100.0, format="%.2f")
+# Entradas
+valor_inicial = st.number_input("Valor inicial (R$)", min_value=0.0, value=16000.0, step=100.0, format="%.2f")
 aporte_mensal = st.number_input("Aporte mensal (R$)", min_value=0.0, value=0.0, step=50.0, format="%.2f")
 dias = st.slider("Número de dias para simulação", min_value=30, max_value=365, value=180)
 
-# Rendimento diário baseado em 100% do CDI (10,65% a.a.)
-rendimento_dia = 0.1065 / 365
-
 # Simulação
+rendimento_dia = 0.1065 / 365
 saldos = []
 datas = []
 saldo = valor_inicial
@@ -39,12 +37,16 @@ for dia in range(1, dias + 1):
     saldos.append(round(saldo, 2))
     datas.append(data_atual + datetime.timedelta(days=dia))
 
-# Gráfico com Plotly
+# Gráfico com tooltip formatado
 fig = go.Figure()
 fig.add_trace(go.Scatter(
-    x=datas, y=saldos, mode='lines+markers', name='Saldo',
+    x=datas,
+    y=saldos,
+    mode='lines+markers',
+    name='Saldo',
     line=dict(color='green', width=3),
-    marker=dict(size=5)
+    marker=dict(size=5),
+    hovertemplate='<b>Data:</b> %{x|%d/%m/%Y}<br><b>Saldo:</b> R$ %{y:,.2f}<extra></extra>',
 ))
 fig.update_layout(
     title="📈 Evolução do Saldo",
@@ -54,10 +56,10 @@ fig.update_layout(
 )
 st.plotly_chart(fig, use_container_width=True)
 
-# Exibir saldo final formatado
+# Texto formatado com R$
 st.success(f"Saldo final após {dias} dias: **{formatar_brl(saldos[-1])}**")
 
-# Exportar dados como JSON
+# Exportar dados
 data_export = {
     "valor_inicial": valor_inicial,
     "aporte_mensal": aporte_mensal,
@@ -65,7 +67,6 @@ data_export = {
     "resultados": saldos,
     "datas": [str(d) for d in datas]
 }
-
 json_str = json.dumps(data_export, indent=2)
 st.download_button("📥 Exportar dados", data=json_str, file_name="simulacao_cofrinho.json")
 
