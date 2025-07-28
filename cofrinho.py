@@ -19,7 +19,7 @@ Simule a evolução do seu investimento como no Cofrinho do Itaú.
 """)
 
 # Entradas
-valor_inicial = st.number_input("Valor inicial (R$)", min_value=0.0, value=16000.0, step=100.0, format="%.2f")
+valor_inicial = st.number_input("Valor inicial (R$)", min_value=0.0, value=10000.0, step=100.0, format="%.2f")
 aporte_mensal = st.number_input("Aporte mensal (R$)", min_value=0.0, value=0.0, step=50.0, format="%.2f")
 dias = st.slider("Número de dias para simulação", min_value=30, max_value=365, value=180)
 
