@@ -2,13 +2,10 @@ import streamlit as st
 import plotly.graph_objects as go
 import json
 import datetime
-import locale
 
-# Define o locale com base no sistema operacional
-try:
-    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')  # Linux/mac
-except:
-    locale.setlocale(locale.LC_ALL, 'Portuguese_Brazil.1252')  # Windows
+# Função para formatar valores como "R$ 16.000,00"
+def formatar_brl(valor):
+    return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 st.set_page_config(page_title="Simulador Cofrinho Itaú", layout="centered")
 st.title("💰 Simulador Cofrinho Itaú - Aporte Mensal")
@@ -53,13 +50,12 @@ fig.update_layout(
     title="📈 Evolução do Saldo",
     xaxis_title="Data",
     yaxis_title="Saldo (R$)",
-    template="plotly_white",
-    yaxis_tickformat=".2f"
+    template="plotly_white"
 )
 st.plotly_chart(fig, use_container_width=True)
 
 # Exibir saldo final formatado
-st.success(f"Saldo final após {dias} dias: **{locale.currency(saldos[-1], grouping=True)}**")
+st.success(f"Saldo final após {dias} dias: **{formatar_brl(saldos[-1])}**")
 
 # Exportar dados como JSON
 data_export = {
